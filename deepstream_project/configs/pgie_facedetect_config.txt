@@ -1,0 +1,50 @@
+################################################################################
+# pgie_facedetect_config.txt
+# Primary GIE Configuration - Face Detection
+#
+# Model: NVIDIA TAO FaceDetectIR (ResNet18, pruned)
+# Output: Bounding boxes for detected faces (class 0 = "face")
+#
+# The model is in .etlt format (encrypted TensorRT-loadable).
+# TensorRT engine will be auto-generated on first run for the target GPU.
+################################################################################
+
+[property]
+gpu-id=0
+net-scale-factor=1.0
+offsets=103.939;116.779;123.68
+model-color-format=1
+
+# ─────────────── Model File Paths ───────────────
+# TAO encrypted model (.etlt) — auto-converts to TensorRT engine
+tlt-encoded-model=/workspace/models/facedetect/resnet18_facedetectir_pruned.etlt
+tlt-model-key=tlt_encode
+labelfile-path=/workspace/models/facedetect/labels.txt
+
+# If you pre-generated a TensorRT engine, use this instead:
+# model-engine-file=/workspace/models/facedetect/resnet18_facedetectir_pruned.etlt_b1_gpu0_fp16.engine
+
+# ─────────────── Network Configuration ───────────────
+batch-size=1
+# 0=FP32, 1=INT8, 2=FP16
+# FP16 recommended for Blackwell GPU (best perf/accuracy balance)
+network-mode=2
+num-detected-classes=1
+interval=0
+gie-unique-id=1
+process-mode=1
+network-type=0
+
+# ─────────────── Input Dimensions ───────────────
+# FaceDetectIR expects 3x544x960 input
+infer-dims=3;544;960
+
+# ─────────────── Detection Parameters ───────────────
+# Clustering for merging overlapping detections
+cluster-mode=2
+maintain-aspect-ratio=1
+
+[class-attrs-all]
+pre-cluster-threshold=0.4
+nms-iou-threshold=0.4
+minBoxes=0
