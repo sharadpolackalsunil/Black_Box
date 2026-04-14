@@ -1,0 +1,67 @@
+%YAML:1.0
+################################################################################
+# tracker_config.yml
+# NvMultiObjectTracker Configuration
+#
+# Uses NvDCF (Discriminative Correlation Filter) tracker for maintaining
+# face identity across frames. Configured for real-time performance on
+# DGX Spark with single USB camera input.
+################################################################################
+
+BaseConfig:
+  minDetectorConfidence: 0.4    # Min PGIE confidence to init a track
+  minTrackerConfidence: 0.5     # Min tracker confidence to maintain track
+  minMatchingScore4Overall: 0.3 # Min overall matching score
+  minTrailingKeyPtsForReidExtraction: 3
+  minConvexHullAreaForReidExtraction: 10.0
+
+TargetManagement:
+  enableBboxUnClipping: 1
+  maxTargetsPerStream: 30          # Max tracked faces per stream
+  minIouDiff4NewTarget: 0.5
+  preserveStreamUpdateOrder: 0
+  maxShadowTrackingAge: 30         # Frames to keep shadow track
+  probationAge: 3                  # Frames before confirming track
+  earlyTerminationAge: 1
+  activeTargetMaxAge: 90           # Max frames to maintain active track
+
+TrajectoryManagement:
+  useUniqueID: 1                   # Unique IDs across streams
+
+DataAssociator:
+  dataAssociatorType: 0            # 0 = Hungarian
+  associationMatcherType: 1        # 1 = Cascaded matching
+  checkClassMatch: 1
+
+  minMatchingScore4ReidSimilarity: 0.5
+  minMatchingScore4VisualSimilarity: 0.4
+  minMatchingScore4SizeSimilarity: 0.5
+  minMatchingScore4Locality: 0.3
+  matchingScoreWeight4VisualSimilarity: 0.5
+  matchingScoreWeight4SizeSimilarity: 0.2
+  matchingScoreWeight4Locality: 0.3
+  tentativeDetectorConfidence: 0.3
+
+StateEstimator:
+  stateEstimatorType: 2            # 2 = Kalman filter
+  noiseWeightVar4Loc: 0.05
+  noiseWeightVar4Vel: 0.00625
+
+  # Kalman filter process noise
+  processNoiseVar4Loc: 2.0
+  processNoiseVar4Size: 1.0
+  measurementNoiseVar4Detector: 4.0
+  measurementNoiseVar4Tracker: 16.0
+
+VisualTracker:
+  visualTrackerType: 1             # 1 = NvDCF
+  useColorNames: 1
+  useHog: 1
+  featureImgSizeLevel: 3           # Balance between accuracy and speed
+  searchRegionPaddingScale: 3.0
+
+  # GPU acceleration for DCF
+  useGpuForVisualTracker: 1
+
+ReID:
+  reidType: 0                      # 0 = Disabled (we use SGIE for embedding)

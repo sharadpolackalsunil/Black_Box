@@ -1,0 +1,3 @@
+# Placeholder: Place face embedding .npy files here
+# Use register_face.py to create embeddings from face images
+# Example: python3 scripts/register_face.py --image photo.jpg --name sharad

@@ -1,0 +1,55 @@
+################################################################################
+# sgie_facenet_config.txt
+# Secondary GIE Configuration - Face Embedding Extraction
+#
+# Model: MobileFaceNet (ONNX) — 128D embedding output
+# Input: Cropped face regions from PGIE
+# Output: 128-dimensional embedding vector (output-tensor-meta=1)
+#
+# CRITICAL: output-tensor-meta=1 enables raw tensor output
+#           which is required for our Python probe to extract embeddings.
+################################################################################
+
+[property]
+gpu-id=0
+net-scale-factor=0.00784313725490196
+offsets=127.5;127.5;127.5
+model-color-format=0
+
+# ─────────────── Model File Paths ───────────────
+onnx-file=/workspace/models/facenet/mobilefacenet.onnx
+labelfile-path=/workspace/models/facenet/labels.txt
+
+# If you pre-generated a TensorRT engine, use this instead:
+# model-engine-file=/workspace/models/facenet/mobilefacenet.onnx_b16_gpu0_fp16.engine
+
+# ─────────────── Network Configuration ───────────────
+batch-size=16
+# FP16 for Blackwell performance
+network-mode=2
+gie-unique-id=2
+process-mode=2
+network-type=1
+
+# ─────────────── Secondary GIE Settings ───────────────
+# Operate on detections from PGIE (gie-unique-id=1)
+operate-on-gie-id=1
+# Operate on class 0 (face) from PGIE
+operate-on-class-ids=0
+
+# ─────────────── Input Dimensions ───────────────
+# MobileFaceNet expects 3x112x112 (NCHW)
+infer-dims=3;112;112
+maintain-aspect-ratio=0
+
+# ─────────────── CRITICAL: Enable tensor output ───────────────
+# This enables raw tensor metadata output, allowing the Python probe
+# to extract the 128D embedding vector for face matching
+output-tensor-meta=1
+
+# Do not classify — we only need the raw embedding
+classifier-async-mode=0
+classifier-threshold=0.0
+
+# Inference interval (run on every frame where a face is detected)
+interval=0
